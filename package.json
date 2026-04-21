@@ -16,7 +16,7 @@
     "zapier-platform-legacy-scripting-runner": "4.0.7"
   },
   "devDependencies": {
-    "jest": "^29.6.0"
+    "jest": "^30.3.0"
   },
   "private": true,
   "zapier": {

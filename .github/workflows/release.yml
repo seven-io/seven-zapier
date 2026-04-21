@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      CI_AUTH_ID: ${{ secrets.ZAPIER_CI_AUTH_ID }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,6 +62,20 @@ jobs:
         env:
           ZAPIER_DEPLOY_KEY: ${{ secrets.ZAPIER_DEPLOY_KEY }}
         run: zapier-platform push
+
+      - name: Post-release smoke test (auth ping against new version)
+        if: ${{ env.CI_AUTH_ID != '' }}
+        env:
+          ZAPIER_DEPLOY_KEY: ${{ secrets.ZAPIER_DEPLOY_KEY }}
+          TAG: ${{ steps.bump.outputs.new_version }}
+        run: |
+          VERSION="${TAG#v}"
+          zapier-platform invoke -r -a "$CI_AUTH_ID" -v "$VERSION" auth test
+
+      - name: Warn if smoke test was skipped
+        if: ${{ env.CI_AUTH_ID == '' }}
+        run: |
+          echo "::warning::ZAPIER_CI_AUTH_ID not set — post-release smoke test was skipped. See RELEASING.md for setup."
 
       - name: Create GitHub Release
         env:

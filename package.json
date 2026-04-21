@@ -4,7 +4,8 @@
   "description": "seven allows you to send a SMS or text-to-speech calls to any mobile phone worldwide, receive SMS and to validate phone numbers.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --testTimeout 10000"
+    "test": "jest --testTimeout 10000",
+    "smoke": "zapier-platform invoke -r -a \"${CI_AUTH_ID:?Set CI_AUTH_ID to a Zapier app connection ID}\" auth test"
   },
   "engines": {
     "node": ">=v22",

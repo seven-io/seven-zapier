@@ -69,6 +69,21 @@ zapier-platform env:get $(node -p 'require("./package.json").version')
 
 The new version is **private** — only you and teammates invited by share link can install it.
 
+### 3a — Automated auth smoke (if `ZAPIER_CI_AUTH_ID` is configured)
+
+The Release workflow already ran `zapier-platform invoke auth test` against the new version on Zapier's production servers. Green = OAuth + HTTP + response parsing all work end-to-end. See "One-time smoke-test setup" at the bottom of this doc if it's being skipped.
+
+Run it locally against any pushed version:
+
+```sh
+export CI_AUTH_ID=<your-zapier-app-connection-id>
+npm run smoke
+```
+
+### 3b — Manual UI test (still required before promoting)
+
+The auth smoke does **not** verify the Zap editor UX, dropdowns, sample data or trigger subscription logic. Do this manually:
+
 1. Open <https://developer.zapier.com/app/139390/versions>
 2. Find the new version → click it → use the private share link to install on your own Zapier account
 3. Build a minimal test Zap covering whatever you changed
@@ -78,7 +93,7 @@ The new version is **private** — only you and teammates invited by share link 
    zapier-platform logs
    ```
 
-**Do not continue to step 4 until step 3 is green.**
+**Do not continue to step 4 until both 3a and 3b are green.**
 
 ## 4 — Promote
 
@@ -150,3 +165,32 @@ git push --tags origin main
 - Version list: <https://developer.zapier.com/app/139390/versions>
 - Active migration/promotion jobs: `zapier-platform jobs`
 - Past jobs: `zapier-platform history`
+
+## One-time smoke-test setup
+
+The Release workflow includes an auth-ping step that runs
+`zapier-platform invoke -r auth test` against the just-pushed version on
+Zapier's production servers. It verifies OAuth + HTTP + response parsing
+end-to-end without sending any SMS or incurring cost.
+
+It is skipped until you configure it (you'll see a warning in the workflow
+run log). To enable:
+
+1. On any Zapier account (your own dev account works fine), install the seven
+   integration and complete the OAuth connection flow.
+2. Visit <https://zapier.com/app/assets/connections>, find the seven connection,
+   and copy its ID — see <https://zpr.io/z8SjFTdnTFZ2> for where to find it in the UI.
+3. In the GitHub repo: **Settings → Secrets and variables → Actions → New
+   repository secret**. Name it `ZAPIER_CI_AUTH_ID` and paste the connection ID.
+
+After this, every release runs the smoke test automatically. The connection
+persists — no token refresh to worry about. If you ever revoke the Zapier
+connection, the secret becomes stale and the smoke step will fail; repeat
+steps 1–3 to replace it.
+
+You can also run the same smoke test locally:
+
+```sh
+export CI_AUTH_ID=<connection-id>
+npm run smoke
+```

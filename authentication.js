@@ -45,7 +45,7 @@ module.exports = {
     },
     autoRefresh: true,
     scope:
-      'analytics balance contacts hooks journal lookup pricing sms status subaccounts validate_for_voice voice',
+      'analytics balance contacts groups hooks journal lookup numbers pricing rcs sms status subaccounts validate_for_voice voice',
   },
   connectionLabel:
     '{{bundle.inputData.email}} (ID: {{bundle.inputData.user_id}})',

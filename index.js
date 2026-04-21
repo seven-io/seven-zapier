@@ -1,6 +1,7 @@
 const authentication = require('./authentication');
 const smsMoTrigger = require('./triggers/sms_mo.js');
 const voiceCallTrigger = require('./triggers/voice_call.js');
+const rcsTrigger = require('./triggers/rcs.js');
 const voiceCreate = require('./creates/voice.js');
 const hlrCreate = require('./creates/hlr.js');
 const mnpCreate = require('./creates/mnp.js');
@@ -8,6 +9,9 @@ const cnamCreate = require('./creates/cnam.js');
 const numberFormatCreate = require('./creates/number_format.js');
 const registerWebhookCreate = require('./creates/register_webhook.js');
 const sendSmsCreate = require('./creates/send_sms.js');
+const sendRcsCreate = require('./creates/send_rcs.js');
+const deleteRcsCreate = require('./creates/delete_rcs.js');
+const sendRcsEventCreate = require('./creates/send_rcs_event.js');
 const analyticsSearch = require('./searches/analytics.js');
 const journalSearch = require('./searches/journal.js');
 const hydrators = require('./hydrators');
@@ -19,6 +23,7 @@ module.exports = {
   triggers: {
     [smsMoTrigger.key]: smsMoTrigger,
     [voiceCallTrigger.key]: voiceCallTrigger,
+    [rcsTrigger.key]: rcsTrigger,
   },
   creates: {
     [voiceCreate.key]: voiceCreate,
@@ -28,6 +33,9 @@ module.exports = {
     [numberFormatCreate.key]: numberFormatCreate,
     [registerWebhookCreate.key]: registerWebhookCreate,
     [sendSmsCreate.key]: sendSmsCreate,
+    [sendRcsCreate.key]: sendRcsCreate,
+    [deleteRcsCreate.key]: deleteRcsCreate,
+    [sendRcsEventCreate.key]: sendRcsEventCreate,
   },
   searches: {
     [analyticsSearch.key]: analyticsSearch,

@@ -13,9 +13,14 @@ Source of truth for the `seven` integration on the Zapier Developer Platform
 **Triggers**
 - `sms_mo` — incoming SMS (inbound webhook)
 - `voice_call` — incoming voice call (inbound webhook)
+- `rcs` — any RCS event (inbound message, delivery/read status, IS_TYPING,
+  suggestion response, user file, location) via inbound webhook
 
 **Creates**
 - `send_sms` — send an SMS
+- `send_rcs` — send an RCS message (plain text or rich content via JSON)
+- `delete_rcs` — revoke a not-yet-delivered RCS message
+- `send_rcs_event` — send an RCS conversation event (`IS_TYPING` / `READ`)
 - `voice` — place a text-to-speech call
 - `hlr` — HLR phone-number lookup
 - `mnp` — MNP (number-portability) lookup

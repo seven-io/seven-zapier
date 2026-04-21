@@ -1,6 +1,6 @@
 {
   "name": "seven",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "seven allows you to send a SMS or text-to-speech calls to any mobile phone worldwide, receive SMS and to validate phone numbers.",
   "main": "index.js",
   "scripts": {

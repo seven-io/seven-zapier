@@ -18,7 +18,8 @@ integration. Work through it top to bottom — skip no step.
 
 - [ ] Working tree clean? (`git status`)
 - [ ] Up to date with `origin/main`? (`git pull`)
-- [ ] Zapier CLI logged in? (`zapier-platform whoami` — if not, `zapier-platform login`)
+- [ ] Zapier CLI logged in? (`zapier-platform integrations` should list seven)
+- [ ] **`CHANGELOG.md` updated with a new `## <new-version>` section** describing user-facing changes. Zapier refuses to `promote` without this. Use "Update" / "Fix" prefixes and `trigger|create|search/<key>` identifiers where applicable — see Zapier's [changelog format](https://docs.zapier.com/platform/reference/cli-docs#changelogmd).
 - [ ] GitHub repo has the `ZAPIER_DEPLOY_KEY` secret set (Settings → Secrets → Actions). Without it, step 1 of the workflow will fail.
 - [ ] Decide which bump type you want:
 
@@ -102,6 +103,8 @@ zapier-platform promote <new-version>
 ```
 
 Effect: the new version becomes the **default** for anyone signing up from now on. Existing users' Zaps are **not touched** by this — they keep running on whatever version they originally created Zaps against.
+
+If this fails with **"Changelog not found"**, you forgot step 0 — add a `## <new-version>` section to `CHANGELOG.md`, commit it, re-push (`zapier-platform push` — works because the version is still private), then retry `promote`.
 
 ## 5 — Migrate existing users
 

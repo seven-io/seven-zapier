@@ -111,11 +111,25 @@ For **non-breaking** changes, users are migrated silently — they don't get not
 
 The bump commit + tag are already on `main`, but the version is not on Zapier.
 
-1. Fix the underlying issue (usually: `ZAPIER_DEPLOY_KEY` secret missing or expired)
-2. On your machine:
+1. Check the workflow logs for the actual error
+2. Common causes:
+   - `ZAPIER_DEPLOY_KEY` secret missing or expired → refresh it in repo settings
+   - **"Version X requires Y to exist"** → Zapier enforces sequential pushes. If
+     there's a version gap (e.g. Visual Builder was on `2.0.1` and you bumped
+     directly to `2.0.3`), you need to push the missing intermediate version
+     first:
+     ```sh
+     git checkout <parent-of-bump-commit>   # package.json at 2.0.2
+     zapier-platform push                   # pushes 2.0.2
+     git checkout main                      # package.json at 2.0.3
+     zapier-platform push                   # pushes 2.0.3
+     ```
+     This only happens on the very first CLI push after converting from
+     Visual Builder, or if you manually skip versions. Normal releases go
+     sequentially and are fine.
+3. Once the push succeeds, create the GitHub Release that the workflow missed:
    ```sh
-   git pull
-   zapier-platform push
+   gh release create vX.Y.Z --generate-notes --title vX.Y.Z
    ```
 
 **Do not** re-run the workflow from scratch — it would bump the version again.

@@ -1,0 +1,7 @@
+{
+  "id": 139390,
+  "key": "Sms77",
+  "includeInBuild": [
+    "scripting.js"
+  ]
+}

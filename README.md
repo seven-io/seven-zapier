@@ -72,37 +72,19 @@ zapier-platform logs
 
 ## Deployment
 
-Version bumping + `zapier-platform push` are automated via GitHub Actions.
-Promoting a version and migrating existing users stay **manual** on purpose —
-both touch production users.
+Version bumps + `zapier-platform push` are automated via a GitHub Actions
+**Release** workflow you trigger manually. Promote and migrate stay on your
+laptop because they touch real user Zaps.
 
-### Releasing a new version
+**Full step-by-step: [RELEASING.md](./RELEASING.md).** Read it before your
+first release.
 
-1. Open the repo on GitHub → **Actions** → **Release** → **Run workflow**.
-2. Pick the bump type (`patch` / `minor` / `major`).
-3. The workflow runs `zapier-platform validate`, bumps `package.json`,
-   commits + tags, pushes the tag back to `main`, runs `zapier-platform push`,
-   and creates a GitHub Release with auto-generated notes.
+TL;DR:
 
-Until you promote, the new version is private on Zapier — existing users are
-untouched.
-
-### Finishing the release (manual, Zapier CLI on your machine)
-
-```sh
-# Make sure the runtime env vars are set on the new version (first CLI push only)
-zapier-platform env:set <version> CLIENT_ID=... CLIENT_SECRET=...
-
-# Promote when the new version is proven — makes it the default for new users
-zapier-platform promote <version>
-
-# Migrate existing users from the previous version
-zapier-platform migrate <old-version> <new-version>
-```
-
-See the Zapier docs for the full
-[version lifecycle](https://docs.zapier.com/platform/build/deployment) and
-[migration mechanics](https://docs.zapier.com/platform/build/migrate).
+1. GitHub → **Actions** → **Release** → Run workflow → pick bump type.
+2. Test the new private version on your own Zapier account.
+3. `zapier-platform promote <new-version>` — default for new users.
+4. `zapier-platform migrate <old-version> <new-version>` — move existing users.
 
 ## CI / CD
 

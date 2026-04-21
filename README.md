@@ -55,7 +55,9 @@ cp .env.example .env
 ## Local development
 
 ```sh
-# Run the Jest test suite
+# Run the Jest test suite. NOTE: the generated tests hit the real seven.io API
+# and require a valid ACCESS_TOKEN / REFRESH_TOKEN in .env to pass. They are
+# intentionally not part of CI — treat them as a local smoke-test tool.
 npm test
 
 # Validate the integration definition against the Zapier schema
@@ -70,30 +72,58 @@ zapier-platform logs
 
 ## Deployment
 
-The integration is **not** pushed automatically. Every release is a manual
-`push` + `promote`.
+Version bumping + `zapier-platform push` are automated via GitHub Actions.
+Promoting a version and migrating existing users stay **manual** on purpose —
+both touch production users.
+
+### Releasing a new version
+
+1. Open the repo on GitHub → **Actions** → **Release** → **Run workflow**.
+2. Pick the bump type (`patch` / `minor` / `major`).
+3. The workflow runs `zapier-platform validate`, bumps `package.json`,
+   commits + tags, pushes the tag back to `main`, runs `zapier-platform push`,
+   and creates a GitHub Release with auto-generated notes.
+
+Until you promote, the new version is private on Zapier — existing users are
+untouched.
+
+### Finishing the release (manual, Zapier CLI on your machine)
 
 ```sh
-# 1. Bump version in package.json (semver: patch for fixes, minor for features)
-
-# 2. Upload this version to Zapier (creates/updates the version in the dashboard,
-#    but does not affect existing users' Zaps until it's promoted)
-zapier-platform push
-
-# 3. Make sure the runtime env vars are set on the new version
+# Make sure the runtime env vars are set on the new version (first CLI push only)
 zapier-platform env:set <version> CLIENT_ID=... CLIENT_SECRET=...
 
-# 4. Promote when the new version is proven (e.g. tested by the team on their
-#    own account). This makes it the default for new users.
+# Promote when the new version is proven — makes it the default for new users
 zapier-platform promote <version>
 
-# 5. Migrate existing users from the previous version
+# Migrate existing users from the previous version
 zapier-platform migrate <old-version> <new-version>
 ```
 
 See the Zapier docs for the full
 [version lifecycle](https://docs.zapier.com/platform/build/deployment) and
 [migration mechanics](https://docs.zapier.com/platform/build/migrate).
+
+## CI / CD
+
+Two GitHub Actions workflows live in `.github/workflows/`:
+
+- **`pr.yml`** — runs on every PR against `main` and on pushes to `main`.
+  Installs deps and runs `zapier-platform validate`. No secrets needed.
+- **`release.yml`** — `workflow_dispatch` only. Bumps the version (patch /
+  minor / major), tags it, and pushes to Zapier. Requires the repository
+  secret `ZAPIER_DEPLOY_KEY`.
+
+### One-time setup: `ZAPIER_DEPLOY_KEY`
+
+1. Log in to the Zapier CLI locally: `zapier-platform login`
+2. Grab the deploy key from `~/.zapierrc` (the `deployKey` field)
+3. In GitHub: **Settings → Secrets and variables → Actions → New repository
+   secret**, name it `ZAPIER_DEPLOY_KEY`, paste the value.
+
+Without this secret the release workflow will fail at the push step, but the
+version bump and tag will still have been created — so rerun after adding it
+or clean up the orphan tag manually.
 
 ## Legacy scripting runner
 

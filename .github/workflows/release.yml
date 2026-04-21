@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump (patch / minor / major)'
+        required: true
+        type: choice
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+env:
+  ZAPIER_SUPPRESS_DEPRECATION_WARNING: '1'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Install Zapier Platform CLI
+        run: npm install -g zapier-platform-cli
+
+      - name: Validate integration (pre-release safety check)
+        run: zapier-platform validate
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version, commit and tag
+        id: bump
+        env:
+          BUMP_TYPE: ${{ inputs.bump }}
+        run: |
+          NEW_VERSION=$(npm version "$BUMP_TYPE" -m "chore(release): v%s")
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Push commit and tag to main
+        run: git push --follow-tags origin main
+
+      - name: Push new version to Zapier
+        env:
+          ZAPIER_DEPLOY_KEY: ${{ secrets.ZAPIER_DEPLOY_KEY }}
+        run: zapier-platform push
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.bump.outputs.new_version }}
+        run: gh release create "$TAG" --generate-notes --title "$TAG"

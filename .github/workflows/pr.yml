@@ -1,0 +1,29 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+env:
+  ZAPIER_SUPPRESS_DEPRECATION_WARNING: '1'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Install Zapier Platform CLI
+        run: npm install -g zapier-platform-cli
+
+      - name: Validate integration
+        run: zapier-platform validate

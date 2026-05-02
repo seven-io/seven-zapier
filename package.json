@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "zapier-platform-core": "18.5.0",
-    "zapier-platform-legacy-scripting-runner": "4.0.7"
+    "zapier-platform-legacy-scripting-runner": "4.0.8"
   },
   "devDependencies": {
     "jest": "^30.3.0"

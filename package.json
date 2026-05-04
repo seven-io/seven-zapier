@@ -12,7 +12,7 @@
     "npm": ">=5.6.0"
   },
   "dependencies": {
-    "zapier-platform-core": "18.5.0",
+    "zapier-platform-core": "18.5.1",
     "zapier-platform-legacy-scripting-runner": "4.0.8"
   },
   "devDependencies": {

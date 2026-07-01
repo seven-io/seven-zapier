@@ -24,7 +24,7 @@ jobs:
     env:
       CI_AUTH_ID: ${{ secrets.ZAPIER_CI_AUTH_ID }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
